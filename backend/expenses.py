@@ -9,10 +9,10 @@ router = APIRouter()
 client = AsyncIOMotorClient("mongodb://localhost:27017")
 db = client.bsec
 
-base_path = "/Expences/"
+base_path = "/Expenses/"
 
 
-class Expences(BaseModel):
+class Expenses(BaseModel):
     id: str
     type: str
     one_time: bool
@@ -24,8 +24,8 @@ class Expences(BaseModel):
 
 # Get all expenses
 @router.get(base_path)
-async def get_expences():
-    collection = db.Expences
+async def get_expenses():
+    collection = db.Expenses
     items = []
     try:
         async for item in collection.find():
@@ -35,32 +35,32 @@ async def get_expences():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# Create new expences
+# Create new expenses
 @router.post(base_path)
-async def create_expecnes(expences: Expences):
-    collection = db.expences
+async def create_expecnes(expenses: Expenses):
+    collection = db.expenses
     try:
-        result = await collection.insert_one(expences)
+        result = await collection.insert_one(expenses)
         return {"_id": str(result.inserted_id)}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-# Update expences
+# Update expenses
 @router.put(base_path)
-async def update_expences(expences: Expences):
-    collection = db.expences
+async def update_expenses(expenses: Expenses):
+    collection = db.expenses
     try:
-        result = await collection.update_one(expences)
+        result = await collection.update_one(expenses)
         return {"_id": str(result.inserted_id)}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-# Delete expences
+# Delete expenses
 @router.delete(base_path)
-async def delete_expences(expences: Expences):
-    collection = db.expences
+async def delete_expenses(expenses: Expenses):
+    collection = db.expenses
     try:
-        result = await collection.delete_one(expences)
+        result = await collection.delete_one(expenses)
         return {"_id": str(result.inserted_id)}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
