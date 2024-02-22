@@ -1,4 +1,4 @@
-"# BSEC2024" 
+# BSEC2024
 
 ## MongoDB setup
 
@@ -11,4 +11,15 @@
 4. Import csv into the collection
 5. Profit big cash $$$$
 
-Start the backend app: uvicorn example:app --reload
+## Python Backend
+
+pip install fastapi uvicorn motor
+cd backend
+uvicorn example:app --reload
+
+## React Frontend
+
+Install node.js
+cd frontend
+npm install
+npm run dev
