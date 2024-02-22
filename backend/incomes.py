@@ -3,14 +3,14 @@ from fastapi import APIRouter, HTTPException
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
 
-from main import serialize_doc
+from common import serialize_doc
 
 router = APIRouter()
 
 client = AsyncIOMotorClient("mongodb://localhost:27017")
 db = client.bsec
 
-base_path = "/incomes/"
+base_path = "/Incomes/"
 
 
 class Income(BaseModel):
@@ -26,7 +26,7 @@ class Income(BaseModel):
 # Get all incomes
 @router.get(base_path)
 async def get_incomes():
-    collection = db.incomes
+    collection = db.Incomes
     items = []
     try:
         async for item in collection.find():
