@@ -2,6 +2,7 @@ from bson import ObjectId
 from fastapi import APIRouter, HTTPException
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
+from pydantic.fields import Field
 
 from common import serialize_doc
 
@@ -14,7 +15,7 @@ base_path = "/Expenses/"
 
 
 class Expenses(BaseModel):
-    Id: str
+    id: str | None = Field(None, alias='_id')
     Type: str
     OneTime: bool
     Start: str
@@ -40,7 +41,7 @@ async def get_expenses():
 
 # Create new expenses
 @router.post(base_path)
-async def create_expecnes(expenses: Expenses):
+async def create_expenses(expenses: Expenses):
     collection = db.Expenses
     try:
         result = await collection.insert_one(expenses.model_dump())
@@ -55,8 +56,8 @@ async def create_expecnes(expenses: Expenses):
 async def update_expenses(expenses: Expenses):
     collection = db.Expenses
     try:
-        await collection.update_one({"_id": ObjectId(expenses.Id)}, {"$set": expenses.model_dump()})
-        return {"_id": str(expenses.Id)}
+        await collection.update_one({"_id": ObjectId(expenses.id)}, {"$set": expenses.model_dump(exclude={"_id"})})
+        return {"_id": str(expenses.id)}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
@@ -67,7 +68,7 @@ async def update_expenses(expenses: Expenses):
 async def delete_expenses(expences: Expenses):
     collection = db.Expenses
     try:
-        await collection.delete_one({"_id": ObjectId(expences.Id)})
-        return {"_id": str(expences.Id)}
+        await collection.delete_one({"_id": ObjectId(expences.id)})
+        return {"_id": str(expences.id)}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
