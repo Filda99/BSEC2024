@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from motor.motor_asyncio import AsyncIOMotorClient
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from common import serialize_doc
 
 
 router = APIRouter()
@@ -12,17 +13,19 @@ base_path = "/Profile/"
 
 
 class Profile(BaseModel):
-    name: str
-    surname: str
-    date_of_birth: str
-    retirement_date: str
+    id: str | None = Field(None, alias='_id')
+    Name: str
+    Surname: str
+    DateOfBirth: str
+    RetirementDate: str
 
 # Get profile info
 @router.get(base_path)
 async def get_profile():
     collection = db.Profile
     try:
-        return await collection.find_one()
+        data = await collection.find_one()
+        return serialize_doc(data)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
