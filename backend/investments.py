@@ -1,20 +1,16 @@
 from bson import ObjectId
 from fastapi import APIRouter, HTTPException
-from motor.motor_asyncio import AsyncIOMotorClient
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-from common import serialize_doc
+from common import serialize_doc, db
 
 router = APIRouter()
-
-client = AsyncIOMotorClient("mongodb://localhost:27017")
-db = client.bsec
 
 base_path = "/Investments/"
 
 
 class Investments(BaseModel):
-    Id: str
+    id: str | None = Field(None, alias="_id")
     Type: str
     OneTime: bool
     Start: str
@@ -52,8 +48,8 @@ async def create_investments(investments: Investments):
 async def update_investments(investments: Investments):
     collection = db.Investments
     try:
-        await collection.update_one({"_id": ObjectId(investments.Id)}, {"$set": investments.model_dump()})
-        return {"_id": str(investments.Id)}
+        await collection.update_one({"_id": ObjectId(investments.id)}, {"$set": investments.model_dump()})
+        return {"_id": str(investments.id)}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -63,8 +59,8 @@ async def update_investments(investments: Investments):
 async def delete_investments(investments: Investments):
     collection = db.Investments
     try:
-        await collection.delete_one({"_id": ObjectId(investments.Id)})
-        return {"_id": str(investments.Id)}
+        await collection.delete_one({"_id": ObjectId(investments.id)})
+        return {"_id": str(investments.id)}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
