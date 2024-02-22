@@ -1,4 +1,6 @@
 import { Link, Outlet, createRootRoute } from '@tanstack/react-router';
+import { SWRConfig } from 'swr';
+import { Fetcher } from '@/api/api';
 
 const ROUTES = [
   {
@@ -25,6 +27,7 @@ const ROUTES = [
 
 const App = () => {
   return (
+    <SWRConfig value={{ fetcher: Fetcher }}>
     <div className="px-20 py-6">
       <nav className="border-b-2 border-black">
         <ul className="flex space-x-2 mb-2">
@@ -39,6 +42,7 @@ const App = () => {
       </nav>
       <Outlet />
     </div>
+    </SWRConfig>
   );
 };
 

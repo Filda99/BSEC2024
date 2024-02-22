@@ -7,6 +7,7 @@ export const apiRequest = axios.create({
     }
 });
 
+export const Fetcher = (url: string) => apiRequest.get(url).then((res) => res.data);
 
 // Incomes
 export const getIncomes = async () => apiRequest.get('/Incomes');
