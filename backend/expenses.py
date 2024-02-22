@@ -51,8 +51,8 @@ async def create_expecnes(expenses: Expenses):
 async def update_expenses(expenses: Expenses):
     collection = db.Expenses
     try:
-        result = await collection.update_one(expenses)
-        return {"_id": str(result.inserted_id)}
+        await collection.update_one({"_id": ObjectId(expenses.Id)}, {"$set": expenses.model_dump()})
+        return {"_id": str(expenses.Id)}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
