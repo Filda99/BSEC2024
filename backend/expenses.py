@@ -24,7 +24,6 @@ class Expenses(BaseModel):
     Value: float
 
 
-
 # Get all expenses
 @router.get(base_path)
 async def get_expenses():
@@ -38,7 +37,6 @@ async def get_expenses():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-
 # Create new expenses
 @router.post(base_path)
 async def create_expenses(expenses: Expenses):
@@ -49,7 +47,6 @@ async def create_expenses(expenses: Expenses):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-
 
 # Update expenses
 @router.put(base_path)
@@ -62,13 +59,15 @@ async def update_expenses(expenses: Expenses):
         raise HTTPException(status_code=500, detail=str(e))
     
 
-
 # Delete expenses
-@router.delete(base_path)
-async def delete_expenses(expences: Expenses):
+@router.delete(base_path+"{expense_id}")
+async def delete_expenses(expense_id: str):
     collection = db.Expenses
     try:
-        await collection.delete_one({"_id": ObjectId(expences.id)})
-        return {"_id": str(expences.id)}
+        # Convert the string ID to ObjectId and attempt to delete the corresponding document
+        result = await collection.delete_one({"_id": ObjectId(expense_id)})
+        if result.deleted_count == 0:
+            return {"message": "Expense not found or already deleted.", "expense_id": expense_id}
+        return {"message": "Expense deleted successfully.", "expense_id": expense_id}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

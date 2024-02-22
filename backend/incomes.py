@@ -64,12 +64,15 @@ async def update_income(income: Income):
     
     
     
-# Delete expenses
-@router.delete(base_path)
-async def delete_income(income: Income):
+# Delete income
+@router.delete(base_path+"{income_id}")
+async def delete_income(income_id: str):
     collection = db.Incomes
     try:
-        await collection.delete_one({"_id": ObjectId(income.id)})
-        return {"_id": str(income.id)}
+        # Convert the string ID to ObjectId and attempt to delete the corresponding document
+        result = await collection.delete_one({"_id": ObjectId(income_id)})
+        if result.deleted_count == 0:
+            return {"message": "Expense not found or already deleted.", "income_id": income_id}
+        return {"message": "Expense deleted successfully.", "income_id": income_id}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

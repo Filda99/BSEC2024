@@ -67,3 +67,16 @@ async def delete_investments(investments: Investments):
         return {"_id": str(investments.Id)}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+
+@router.delete(base_path+"{investments_id}")
+async def delete_investments(investments_id: str):
+    collection = db.Expenses
+    try:
+        # Convert the string ID to ObjectId and attempt to delete the corresponding document
+        result = await collection.delete_one({"_id": ObjectId(investments_id)})
+        if result.deleted_count == 0:
+            return {"message": "Expense not found or already deleted.", "investments_id": investments_id}
+        return {"message": "Expense deleted successfully.", "investments_id": investments_id}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
