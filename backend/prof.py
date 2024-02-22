@@ -1,13 +1,9 @@
 from fastapi import APIRouter, HTTPException
-from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel, Field
-from common import serialize_doc
+from common import serialize_doc, db
 
 
 router = APIRouter()
-
-client = AsyncIOMotorClient("mongodb://localhost:27017")
-db = client.bsec
 
 base_path = "/Profile/"
 

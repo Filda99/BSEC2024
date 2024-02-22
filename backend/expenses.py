@@ -1,28 +1,23 @@
 from bson import ObjectId
 from fastapi import APIRouter, HTTPException
-from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
 from pydantic.fields import Field
 
-from common import serialize_doc
+from common import serialize_doc, db
 
 router = APIRouter()
-
-client = AsyncIOMotorClient("mongodb://localhost:27017")
-db = client.bsec
 
 base_path = "/Expenses/"
 
 
 class Expenses(BaseModel):
-    id: str | None = Field(None, alias='_id')
+    id: str | None = Field(None, alias="_id")
     Type: str
     OneTime: bool
     Start: str
     End: str | None
     Frequency: str
     Value: float
-
 
 
 # Get all expenses
@@ -38,7 +33,6 @@ async def get_expenses():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-
 # Create new expenses
 @router.post(base_path)
 async def create_expenses(expenses: Expenses):
@@ -48,7 +42,6 @@ async def create_expenses(expenses: Expenses):
         return {"_id": str(result.inserted_id)}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
 
 
 # Update expenses
@@ -56,11 +49,12 @@ async def create_expenses(expenses: Expenses):
 async def update_expenses(expenses: Expenses):
     collection = db.Expenses
     try:
-        await collection.update_one({"_id": ObjectId(expenses.id)}, {"$set": expenses.model_dump(exclude={"_id"})})
+        await collection.update_one(
+            {"_id": ObjectId(expenses.id)}, {"$set": expenses.model_dump(exclude={"_id"})}
+        )
         return {"_id": str(expenses.id)}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
 
 
 # Delete expenses
