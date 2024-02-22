@@ -12,11 +12,11 @@ base_path = "/Expenses/"
 
 class Expenses(BaseModel):
     id: str | None = Field(None, alias="_id")
-    Type: str
+    Type: int
     OneTime: bool
     Start: str
     End: str | None
-    Frequency: str
+    Frequency: int
     Value: float
 
 
