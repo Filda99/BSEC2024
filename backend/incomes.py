@@ -2,6 +2,7 @@ from bson import ObjectId
 from fastapi import APIRouter, HTTPException
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
+from pydantic.fields import Field
 
 from common import serialize_doc
 
@@ -14,13 +15,14 @@ base_path = "/Incomes/"
 
 
 class Income(BaseModel):
-    id: str
-    type: str
-    one_time: bool
-    start: str
-    end: str | None
-    frequency: str
-    value: float
+    id: str | None = Field(None, alias='_id')
+    Type: str
+    OneTime: bool
+    Start: str
+    End: str | None
+    Frequency: str
+    Value: float
+
 
 
 # Get all incomes
@@ -36,15 +38,18 @@ async def get_incomes():
         raise HTTPException(status_code=500, detail=str(e))
 
 
+
+
 # Create new income
 @router.post(base_path)
 async def create_income(income: Income):
     collection = db.Incomes
     try:
-        result = await collection.insert_one(income)
+        result = await collection.insert_one(income.model_dump())
         return {"_id": str(result.inserted_id)}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 
 # Update income
@@ -52,17 +57,19 @@ async def create_income(income: Income):
 async def update_income(income: Income):
     collection = db.Incomes
     try:
-        await collection.update_one({"_id": ObjectId(income.id)}, {"$set": income.model_dump()})
-        return {"_id": income.id}
+        await collection.update_one({"_id": ObjectId(income.id)}, {"$set": income.model_dump(exclude={"_id"})})
+        return {"_id": str(income.id)}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-# Delete income
+    
+    
+# Delete expenses
 @router.delete(base_path)
 async def delete_income(income: Income):
     collection = db.Incomes
     try:
         await collection.delete_one({"_id": ObjectId(income.id)})
-        return {"_id": income.id}
+        return {"_id": str(income.id)}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

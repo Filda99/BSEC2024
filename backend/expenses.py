@@ -23,6 +23,7 @@ class Expenses(BaseModel):
     Value: float
 
 
+
 # Get all expenses
 @router.get(base_path)
 async def get_expenses():
@@ -36,6 +37,7 @@ async def get_expenses():
         raise HTTPException(status_code=500, detail=str(e))
 
 
+
 # Create new expenses
 @router.post(base_path)
 async def create_expecnes(expenses: Expenses):
@@ -46,6 +48,8 @@ async def create_expecnes(expenses: Expenses):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
+
+
 # Update expenses
 @router.put(base_path)
 async def update_expenses(expenses: Expenses):
@@ -56,6 +60,8 @@ async def update_expenses(expenses: Expenses):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
+
+
 # Delete expenses
 @router.delete(base_path)
 async def delete_expenses(expences: Expenses):
