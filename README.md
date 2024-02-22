@@ -10,3 +10,5 @@
     - other values default
 4. Import csv into the collection
 5. Profit big cash $$$$
+
+Start the backend app: uvicorn example:app --reload
