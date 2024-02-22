@@ -1,8 +1,7 @@
 from bson import ObjectId
 from fastapi import APIRouter, HTTPException
 from motor.motor_asyncio import AsyncIOMotorClient
-from pydantic import BaseModel
-from pydantic.fields import Field
+from pydantic import BaseModel, Field
 
 from common import serialize_doc
 
