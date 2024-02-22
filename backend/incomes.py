@@ -39,7 +39,7 @@ async def get_incomes():
 # Create new income
 @router.post(base_path)
 async def create_income(income: Income):
-    collection = db.incomes
+    collection = db.Incomes
     try:
         result = await collection.insert_one(income)
         return {"_id": str(result.inserted_id)}
@@ -50,7 +50,7 @@ async def create_income(income: Income):
 # Update income
 @router.put(base_path)
 async def update_income(income: Income):
-    collection = db.incomes
+    collection = db.Incomes
     try:
         await collection.update_one({"_id": ObjectId(income.id)}, {"$set": income.model_dump()})
         return {"_id": income.id}
@@ -60,7 +60,7 @@ async def update_income(income: Income):
 # Delete income
 @router.delete(base_path)
 async def delete_income(income: Income):
-    collection = db.incomes
+    collection = db.Incomes
     try:
         await collection.delete_one({"_id": ObjectId(income.id)})
         return {"_id": income.id}

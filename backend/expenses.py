@@ -1,3 +1,4 @@
+from bson import ObjectId
 from fastapi import APIRouter, HTTPException
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
@@ -13,13 +14,13 @@ base_path = "/Expenses/"
 
 
 class Expenses(BaseModel):
-    id: str
-    type: str
-    one_time: bool
-    start: str
-    end: str | None
-    frequency: str
-    value: float
+    Id: str
+    Type: str
+    OneTime: bool
+    Start: str
+    End: str | None
+    Frequency: str
+    Value: float
 
 
 # Get all expenses
@@ -38,9 +39,9 @@ async def get_expenses():
 # Create new expenses
 @router.post(base_path)
 async def create_expecnes(expenses: Expenses):
-    collection = db.expenses
+    collection = db.Expenses
     try:
-        result = await collection.insert_one(expenses)
+        result = await collection.insert_one(expenses.model_dump())
         return {"_id": str(result.inserted_id)}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -48,7 +49,7 @@ async def create_expecnes(expenses: Expenses):
 # Update expenses
 @router.put(base_path)
 async def update_expenses(expenses: Expenses):
-    collection = db.expenses
+    collection = db.Expenses
     try:
         result = await collection.update_one(expenses)
         return {"_id": str(result.inserted_id)}
@@ -57,10 +58,10 @@ async def update_expenses(expenses: Expenses):
     
 # Delete expenses
 @router.delete(base_path)
-async def delete_expenses(expenses: Expenses):
-    collection = db.expenses
+async def delete_expenses(expences: Expenses):
+    collection = db.Expenses
     try:
-        result = await collection.delete_one(expenses)
-        return {"_id": str(result.inserted_id)}
+        await collection.delete_one({"_id": ObjectId(expences.Id)})
+        return {"_id": str(expences.Id)}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
