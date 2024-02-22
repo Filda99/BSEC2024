@@ -10,7 +10,7 @@ export const apiRequest = axios.create({
 
 // Incomes
 export const getIncomes = async () => apiRequest.get('/Incomes');
-export const createIncomes = async (data: unknown) => apiRequest.post('/Incomes', data);
+export const createIncome = async (data: unknown) => apiRequest.post('/Incomes', data);
 export const updateIncome = async (data: unknown) => apiRequest.put('/Incomes', data);
 export const deleteIncome = async (id: string) => apiRequest.delete(`/Incomes/${id}`);
 

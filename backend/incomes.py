@@ -10,14 +10,13 @@ base_path = "/Incomes/"
 
 
 class Income(BaseModel):
-    id: str | None = Field(None, alias='_id')
-    Type: str
+    id: str | None = Field(None, alias="_id")
+    Type: int
     OneTime: bool
     Start: str
     End: str | None
-    Frequency: str
+    Frequency: int
     Value: float
-
 
 
 # Get all incomes
@@ -33,8 +32,6 @@ async def get_incomes():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-
-
 # Create new income
 @router.post(base_path)
 async def create_income(income: Income):
@@ -46,21 +43,21 @@ async def create_income(income: Income):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-
 # Update income
 @router.put(base_path)
 async def update_income(income: Income):
     collection = db.Incomes
     try:
-        await collection.update_one({"_id": ObjectId(income.id)}, {"$set": income.model_dump(exclude={"_id"})})
+        await collection.update_one(
+            {"_id": ObjectId(income.id)}, {"$set": income.model_dump(exclude={"_id"})}
+        )
         return {"_id": str(income.id)}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
-    
-    
+
+
 # Delete income
-@router.delete(base_path+"{income_id}")
+@router.delete(base_path + "{income_id}")
 async def delete_income(income_id: str):
     collection = db.Incomes
     try:

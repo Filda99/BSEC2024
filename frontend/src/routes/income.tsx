@@ -6,6 +6,7 @@ import { InputGroup } from '@/components/InputGroup';
 import { Select, SelectItem } from '@/components/Select';
 import { createFileRoute } from '@tanstack/react-router';
 import { Controller, useForm } from 'react-hook-form';
+import { getIncomes, createIncome, updateIncome, deleteIncome } from '@/api/api';
 
 const options: SelectItem[] = [
   { id: 1, name: 'Option 1' },
@@ -19,33 +20,37 @@ const ONE_TIME_OPTIONS: SelectItem[] = [
 ];
 
 type FormValues = {
-  type: number;
-  oneTime: number;
-  frequency: number;
-  amount: number;
-  startDate: Date;
-  endDate: Date;
+  Type: number;
+  OneTime: number;
+  Frequency: number;
+  Value: number;
+  Start: Date;
+  End: Date;
 };
 
 const Income = () => {
-  const { register, control, watch } = useForm<FormValues>({
+  const { register, control, watch, handleSubmit } = useForm<FormValues>({
     defaultValues: {
-      amount: 0,
-      type: 1,
-      oneTime: 0,
-      frequency: 1,
-      startDate: new Date(),
-      endDate: new Date(),
+      Value: 0,
+      Type: 1,
+      OneTime: 0,
+      Frequency: 1,
+      Start: new Date(),
+      End: new Date(),
     },
   });
 
-  const isOneTimeIncome = watch('oneTime');
+  const isOneTimeIncome = watch('OneTime');
+
+  const onSubmit = (data: FormValues) => {
+    createIncome(data);
+  };
 
   return (
-    <form className="space-y-4 mt-5 max-w-72">
+    <form className="space-y-4 mt-5 max-w-72" onSubmit={handleSubmit(onSubmit)}>
       <Controller
         control={control}
-        name="type"
+        name="Type"
         render={({ field: { value, onChange } }) => (
           <InputGroup label="Type">
             <Select onChange={onChange} options={options} selected={value} />
@@ -55,7 +60,7 @@ const Income = () => {
 
       <Controller
         control={control}
-        name="oneTime"
+        name="OneTime"
         render={({ field: { value, onChange } }) => (
           <InputGroup label="One time">
             <Select onChange={onChange} options={ONE_TIME_OPTIONS} selected={value} />
@@ -66,7 +71,7 @@ const Income = () => {
       {isOneTimeIncome === 1 && (
         <Controller
           control={control}
-          name="frequency"
+          name="Frequency"
           render={({ field: { value, onChange } }) => (
             <InputGroup label="Frequency">
               <Select onChange={onChange} options={options} selected={value} />
@@ -77,7 +82,7 @@ const Income = () => {
 
       <Controller
         control={control}
-        name="startDate"
+        name="Start"
         render={({ field: { value, onChange } }) => (
           <InputGroup label="From">
             <DatePicker onChange={onChange} value={value} />
@@ -86,7 +91,7 @@ const Income = () => {
       />
       <Controller
         control={control}
-        name="endDate"
+        name="End"
         render={({ field: { value, onChange } }) => (
           <InputGroup label="To">
             <DatePicker onChange={onChange} value={value} />
@@ -95,7 +100,7 @@ const Income = () => {
       />
 
       <InputGroup label="Amount">
-        <Input {...register('amount')} />
+        <Input {...register('Value')} />
       </InputGroup>
 
       <Button type="submit">Sumbit</Button>
