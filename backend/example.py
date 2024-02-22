@@ -1,21 +1,28 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from motor.motor_asyncio import AsyncIOMotorClient
-from fastapi.encoders import jsonable_encoder
+from bson import ObjectId
 
 app = FastAPI()
 
-# Initialize MongoDB client and select your database
 client = AsyncIOMotorClient('mongodb://localhost:27017')
-db = client.yourDatabaseName
+db = client.bsec
+
+# Helper function to handle MongoDB ObjectId
+def serialize_doc(doc):
+    doc["_id"] = str(doc["_id"])
+    return doc
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "Hello from the bsec database"}
 
 @app.get("/items/")
 async def read_items():
-    collection = db.yourCollectionName
+    collection = db.bsec
     items = []
-    async for item in collection.find():
-        items.append(item)
-    return jsonable_encoder(items)
+    try:
+        async for item in collection.find():
+            items.append(serialize_doc(item))
+        return items
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
