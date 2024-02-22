@@ -1,3 +1,4 @@
+from bson import ObjectId
 from fastapi import APIRouter, HTTPException
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
@@ -13,6 +14,7 @@ base_path = "/incomes/"
 
 
 class Income(BaseModel):
+    id: str
     type: str
     one_time: bool
     start: str
@@ -41,5 +43,26 @@ async def create_income(income: Income):
     try:
         result = await collection.insert_one(income)
         return {"_id": str(result.inserted_id)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# Update income
+@router.put(base_path)
+async def update_income(income: Income):
+    collection = db.incomes
+    try:
+        await collection.update_one({"_id": ObjectId(income.id)}, {"$set": income.model_dump()})
+        return {"_id": income.id}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+# Delete income
+@router.delete(base_path)
+async def delete_income(income: Income):
+    collection = db.incomes
+    try:
+        await collection.delete_one({"_id": ObjectId(income.id)})
+        return {"_id": income.id}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
