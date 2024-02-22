@@ -1,16 +1,86 @@
 from fastapi import HTTPException
-from motor.motor_asyncio import AsyncIOMotorClient
-from common import serialize_doc
+from common import serialize_doc, db
+from bson import ObjectId
+from datetime import datetime
 
+# Assuming you have a 'db' instance of MongoClient already defined
 
-client = AsyncIOMotorClient("mongodb://localhost:27017")
-db = client.bsec
-
-# Function to get specific stock from database by name
-def get_stock(name: str):
-    collection = db.Stocks
+# Function will get all stocks from the database Invesments collection
+async def get_investments():
+    collection = db.Investments
+    items = []
     try:
-        return serialize_doc(collection.find_one({"Name": name}))
+        async for item in collection.find():
+            items.append(serialize_doc(item))
+        return items
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
+
+async def get_BaseInfo(stockId):
+    collection = db.bsec
+    try:
+        return await collection.find_one({"_id": stockId})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# Function will get all expenses from the database Expenses collection
+async def get_expenses():
+    collection = db.Expenses
+    items = []
+    try:
+        async for item in collection.find():
+            items.append(serialize_doc(item))
+        return items
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+
+# Function will get all incomes from the database Incomes collection
+async def get_incomes():
+    collection = db.Incomes
+    items = []
+    try:
+        async for item in collection.find():
+            items.append(serialize_doc(item))
+        return items
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# Function will calculate the prediction of the stock for the possible scenarios
+async def calculatePrediction(startDate, endDate):
+    # Calculate days between the start and end date from string to datetime
+    
+    start_date_obj = datetime.fromisoformat(startDate)
+    end_date_obj = datetime.fromisoformat(endDate)
+
+    duration = (end_date_obj - start_date_obj).days
+    
+    stocks = await get_investments()
+    scenarios = ['Negativní scénář (růstová míra %)', 'Neutrální scénář (růstová míra %)', 'Pozitivní scénář (růstová míra %)']
+    scenarioArrays = [[], [], []]
+    for index, scenario in enumerate(scenarios):
+        for stock in stocks:
+            # Get base info from bsec database
+            baseInfo = await get_BaseInfo(ObjectId(stock['_id']))
+            for i in range(duration):
+                value = baseInfo['Value'] * 1/365 * i * (baseInfo[scenario]) / 100
+                scenarioArrays[index].append(value)
+    
+    # Sum the scenarioArrays and return the result
+    summed_array = [sum(elements) for elements in zip(*scenarioArrays)]
+    
+    # Calculate the free cash flow based on expenses and incomes
+    expenses = await get_expenses()
+    incomes = await get_incomes()
+    freeCashFlow = 0
+    for expense in expenses:
+        freeCashFlow -= expense['Value']
+    for income in incomes:
+        freeCashFlow += income['Value']
+    
+    # Iterate through the summed_array and add the free cash flow
+    for index, value in enumerate(summed_array):
+        summed_array[index] += freeCashFlow
