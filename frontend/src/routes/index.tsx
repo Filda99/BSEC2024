@@ -17,7 +17,7 @@ import PacmanLoader from 'react-spinners/PacmanLoader';
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 const Dashboard = () => {
-  const { data, error, isLoading } = useSWR('/'); // Adjust your fetch URL
+  const { data, error, isLoading, isValidating } = useSWR('/'); // Adjust your fetch URL
 
   // Assuming your API returns an array of arrays for predictions
   // Each sub-array contains the predictions for one scenario
@@ -52,7 +52,7 @@ const Dashboard = () => {
     ],
   });
 
-  if (isLoading) {
+  if (isLoading || isValidating) {
     return (
       <div className="h-full flex items-center">
         <PacmanLoader className="mx-auto" color="#191817" />
@@ -66,7 +66,7 @@ const Dashboard = () => {
   const chartData = formatChartData(data);
 
   return (
-    <div className='mt-4'>
+    <div className="mt-4">
       <Line data={chartData} />
     </div>
   );

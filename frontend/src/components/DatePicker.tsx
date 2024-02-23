@@ -20,7 +20,17 @@ export const DatePicker: React.FC<DatePickerProps> = ({ onChange, value }) => {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0 bg-white" align="start">
-        <Calendar mode="single" selected={value} onSelect={onChange} initialFocus />
+        <Calendar
+          mode="single"
+          selected={value}
+          disabled={date => {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            return date < today;
+          }}
+          onSelect={onChange}
+          initialFocus
+        />
       </PopoverContent>
     </Popover>
   );
