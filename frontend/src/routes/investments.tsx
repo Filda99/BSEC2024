@@ -35,7 +35,7 @@ const Investments = () => {
     defaultValues: {
       Type: 0,
       OneTime: 0,
-      InvestmentId: '65d7d71de35504b993e2dd68',
+      InvestmentId: '65d74fc56941a3ad3e242bcb',
       Frequency: 0,
       Value: 100,
       Start: new Date(),
@@ -48,7 +48,9 @@ const Investments = () => {
     mutate();
   };
 
-  const isPeriodicIncome = watch('OneTime') === 0;
+  const { OneTime, InvestmentId, Value } = watch();
+
+  const isPeriodicIncome = OneTime === 0;
   const isStockSelected = watch('Type') === 0;
 
   const onSubmit = async (data: InvestmentFormValues) => {
