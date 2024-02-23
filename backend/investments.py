@@ -1,4 +1,5 @@
 from bson import ObjectId
+from colorama import init
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
@@ -82,11 +83,12 @@ async def prediction(investmentId: str, amount: float):
         pos = stock["Pozitivní scénář (růstová míra %)"]
         neut = stock["Neutrální scénář (růstová míra %)"]
         neg = stock["Negativní scénář (růstová míra %)"]
-        pos_list, neut_list, neg_list = [], [], []
+        init_value = stock["kurz"]*amount
+        pos_list, neut_list, neg_list = [init_value], [init_value], [init_value]
         for m in range(1, 13):
-            pos_list.append(m / 12 * (amount * (1 + pos / 100)))
-            neut_list.append(m / 12 * (amount * (1 + neut / 100)))
-            neg_list.append(m / 12 * (amount * (1 + neg / 100)))
+            pos_list.append((m / 12 * pos / 100 * init_value) + init_value)
+            neut_list.append((m / 12 * neut / 100 * init_value) + init_value)
+            neg_list.append((m / 12 * neg / 100 * init_value) + init_value)
         return {"pos": pos_list, "neut": neut_list, "neg": neg_list}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
