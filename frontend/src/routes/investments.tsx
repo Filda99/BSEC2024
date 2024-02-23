@@ -9,6 +9,8 @@ import useSWR from 'swr';
 import { DatePicker } from '@/components/DatePicker';
 import { Button } from '@/components/Button';
 import { InvestmentsTable } from '@/components/InvestmentsTable';
+import { useEffect } from 'react';
+import { set } from 'date-fns';
 
 export type InvestmentFormValues = {
   Type: number;
@@ -31,11 +33,11 @@ const Investments = () => {
 
   const { register, control, watch, handleSubmit } = useForm<InvestmentFormValues>({
     defaultValues: {
-      Value: 0,
       Type: 0,
       OneTime: 0,
       InvestmentId: '65d7d71de35504b993e2dd68',
       Frequency: 0,
+      Value: 100,
       Start: new Date(),
       End: new Date(),
     },

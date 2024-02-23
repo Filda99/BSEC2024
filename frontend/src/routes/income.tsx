@@ -28,7 +28,7 @@ const Income = () => {
 
   const { register, control, watch, handleSubmit } = useForm<IncomeFormValues>({
     defaultValues: {
-      Value: 0,
+      Value: 100,
       Type: 0,
       OneTime: 0,
       Frequency: 0,

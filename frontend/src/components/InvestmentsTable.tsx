@@ -36,7 +36,7 @@ export const InvestmentsTable: React.FC<InvestmentTableProps> = ({ data, stocks,
           header: () => 'Frequency',
           cell: ({ getValue, row }) => {
             const { OneTime } = row.original;
-            if (OneTime === 0) {
+            if (OneTime) {
               return 'One time';
             } else {
               return FREQUENCY_OPTIONS.find(({ id }) => id === getValue())?.name;

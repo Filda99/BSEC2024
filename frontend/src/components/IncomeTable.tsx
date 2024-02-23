@@ -27,7 +27,7 @@ export const IncomeTable: React.FC<IncomeTableProps> = ({ data, onDelete }) => {
           header: () => 'Frequency',
           cell: ({ getValue, row }) => {
             const { OneTime } = row.original;
-            if (OneTime === 0) {
+            if (OneTime) {
               return 'One time';
             } else {
               return FREQUENCY_OPTIONS.find(({ id }) => id === getValue())?.name;
