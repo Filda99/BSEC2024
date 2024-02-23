@@ -50,8 +50,9 @@ async def root():
 @app.get("/Wealth")
 async def wealth():
     wealth = await aggregateWealth("2024-01-01", "2025-12-31")
-    for w in wealth:
-        w[0] = str(w[0])
+    for key in wealth:
+        for w in wealth[key]:
+            w[0] = str(w[0])
     return JSONResponse(content=wealth)
 
 @app.get("/Stocks")
