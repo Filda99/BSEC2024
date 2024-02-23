@@ -66,9 +66,9 @@ async def calculatePrediction(startDate, endDate):
             # Get base info from bsec database
             stockValue = 0
             for stock in stocks:
-                value = stock['value']
+                value = stock['Value']
                 baseInfo = await get_BaseInfo(ObjectId(stock['investmentId']))
-                value += 1/365 * i * (baseInfo[scenario]) / 100 * stock['value']
+                value += 1/365 * i * (baseInfo[scenario]) / 100 * stock['Value']
                 stockValue += value
             scenarioArrays[index].append(stockValue)
     
