@@ -17,7 +17,7 @@ export const Table = <TData,>({ data, columns }: TableProps<TData>) => {
   const showEmptyMessage = getRowModel().rows.length === 0;
 
   return (
-    <div>
+    <div className="flex-1">
       <table className="w-full border-collapse border">
         <thead className="bg-gray-100 font-semibold leading-4 text-gray-500 ">
           {getHeaderGroups().map(headerGroup => (

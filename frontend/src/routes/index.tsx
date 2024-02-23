@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -14,15 +13,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import useSWR from 'swr';
 
 // Register Chart.js components
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-);
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 const Dashboard = () => {
   const { data, error, isLoading } = useSWR('/'); // Adjust your fetch URL
@@ -30,7 +21,7 @@ const Dashboard = () => {
   // Assuming your API returns an array of arrays for predictions
   // Each sub-array contains the predictions for one scenario
 
-  const formatChartData = (predictions) => ({
+  const formatChartData = predictions => ({
     labels: Array.from({ length: predictions[0].length }, (_, i) => `Day ${i + 1}`),
     datasets: [
       {
@@ -59,11 +50,10 @@ const Dashboard = () => {
       },
     ],
   });
-  
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading data!</div>;
-  
+
   // Format the fetched data for the chart
   const chartData = formatChartData(data);
 

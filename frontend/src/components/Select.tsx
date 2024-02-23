@@ -3,14 +3,14 @@ import { Listbox } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/24/solid';
 
 export type SelectItem = {
-  id: number;
+  id: number | string;
   name: string;
 };
 
 type SelectProps = {
   options: SelectItem[];
-  onChange: (value: number) => void;
-  selected: number;
+  onChange: (value: number | string) => void;
+  selected: number | string;
 };
 
 export const Select: React.FC<SelectProps> = ({ options, onChange, selected }) => {
