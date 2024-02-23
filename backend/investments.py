@@ -54,6 +54,7 @@ async def update_investments(investments: Investments):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 # Delete investment
 @router.delete(base_path + "{investments_id}")
 async def delete_investments(investments_id: str):

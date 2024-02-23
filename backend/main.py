@@ -1,4 +1,6 @@
 from gc import collect
+import json
+import re
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -52,7 +54,7 @@ async def stocks():
     try:
         async for item in collection.find():
             items.append(serialize_doc(item))
-        items = [Stock(**item) for item in items]
+        items = [Stock(**item).model_dump() for item in items]
         return items
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
