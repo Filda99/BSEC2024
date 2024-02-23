@@ -11,6 +11,7 @@ import {
 import { Line } from 'react-chartjs-2';
 import { createFileRoute } from '@tanstack/react-router';
 import useSWR from 'swr';
+import PacmanLoader from 'react-spinners/PacmanLoader';
 
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
@@ -51,14 +52,21 @@ const Dashboard = () => {
     ],
   });
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) {
+    return (
+      <div className="h-full flex items-center">
+        <PacmanLoader className="mx-auto" color="#191817" />
+      </div>
+    );
+  }
+
   if (error) return <div>Error loading data!</div>;
 
   // Format the fetched data for the chart
   const chartData = formatChartData(data);
 
   return (
-    <div>
+    <div className='mt-4'>
       <Line data={chartData} />
     </div>
   );

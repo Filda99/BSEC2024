@@ -47,7 +47,14 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({ data, onDelete }) =>
         columnHelper.accessor('End', {
           id: 'endDate',
           header: () => 'To',
-          cell: ({ getValue }) => format(getValue(), 'd. M. yyyy'),
+          cell: ({ getValue, row }) => {
+            const { OneTime } = row.original;
+            if (OneTime) {
+              return undefined;
+            } else {
+              return format(getValue(), 'd. M. yyyy');
+            }
+          },
         }),
         columnHelper.display({
           id: 'actions',

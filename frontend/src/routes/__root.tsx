@@ -25,7 +25,7 @@ const ROUTES = [
 const App = () => {
   return (
     <SWRConfig value={{ fetcher: Fetcher }}>
-      <div className="px-20 py-6">
+      <div className="px-20 py-6 h-full">
         <nav className="border-b border-black flex items-center justify-between text-lg">
           <ul className="flex space-x-2 mb-2">
             {ROUTES.map(({ name, path }) => (

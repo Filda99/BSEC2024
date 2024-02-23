@@ -9,6 +9,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { createIncome, deleteIncome } from '@/api/api';
 import useSWR from 'swr';
 import { FREQUENCY_OPTIONS, ONE_TIME_OPTIONS, INCOME_TYPE_OPTIONS } from '@/constants';
+import { CurrencyDollarIcon } from '@heroicons/react/24/outline';
 
 export type IncomeFormValues = {
   Type: number;
@@ -78,6 +79,18 @@ const Income = () => {
           )}
         />
 
+        {isPeriodicIncome && (
+          <Controller
+            control={control}
+            name="Frequency"
+            render={({ field: { value, onChange } }) => (
+              <InputGroup label="Frequency">
+                <Select onChange={onChange} options={FREQUENCY_OPTIONS} selected={value} />
+              </InputGroup>
+            )}
+          />
+        )}
+
         <Controller
           control={control}
           name="Start"
@@ -100,20 +113,8 @@ const Income = () => {
           />
         )}
 
-        {isPeriodicIncome && (
-          <Controller
-            control={control}
-            name="Frequency"
-            render={({ field: { value, onChange } }) => (
-              <InputGroup label="Frequency">
-                <Select onChange={onChange} options={FREQUENCY_OPTIONS} selected={value} />
-              </InputGroup>
-            )}
-          />
-        )}
-
         <InputGroup label="Amount">
-          <Input {...register('Value')} />
+          <Input {...register('Value')} Icon={CurrencyDollarIcon} />
         </InputGroup>
         <Button type="submit">Sumbit</Button>
       </form>
