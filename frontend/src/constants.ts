@@ -9,7 +9,7 @@ export const INCOME_TYPE_OPTIONS: SelectItem[] = [
 export const INVESTMENT_TYPE_OPTIONS: SelectItem[] = [
   { id: 0, name: 'Stocks' },
   { id: 1, name: 'Bonds' },
-  { id: 2, name: 'ETFS' },
+  { id: 2, name: 'ETFs' },
   { id: 3, name: 'Crypto' },
 ];
 

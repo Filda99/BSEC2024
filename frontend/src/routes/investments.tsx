@@ -9,8 +9,7 @@ import useSWR from 'swr';
 import { DatePicker } from '@/components/DatePicker';
 import { Button } from '@/components/Button';
 import { InvestmentsTable } from '@/components/InvestmentsTable';
-import { useEffect } from 'react';
-import { set } from 'date-fns';
+import { CurrencyDollarIcon } from '@heroicons/react/24/outline';
 
 export type InvestmentFormValues = {
   Type: number;
@@ -94,6 +93,18 @@ const Investments = () => {
           )}
         />
 
+        {isPeriodicIncome && (
+          <Controller
+            control={control}
+            name="Frequency"
+            render={({ field: { value, onChange } }) => (
+              <InputGroup label="Frequency">
+                <Select onChange={onChange} options={FREQUENCY_OPTIONS} selected={value} />
+              </InputGroup>
+            )}
+          />
+        )}
+
         <Controller
           control={control}
           name="Start"
@@ -116,20 +127,8 @@ const Investments = () => {
           />
         )}
 
-        {isPeriodicIncome && (
-          <Controller
-            control={control}
-            name="Frequency"
-            render={({ field: { value, onChange } }) => (
-              <InputGroup label="Frequency">
-                <Select onChange={onChange} options={FREQUENCY_OPTIONS} selected={value} />
-              </InputGroup>
-            )}
-          />
-        )}
-
         <InputGroup label="Amount">
-          <Input {...register('Value')} />
+          <Input {...register('Value')} Icon={CurrencyDollarIcon} />
         </InputGroup>
         <Button type="submit">Sumbit</Button>
       </form>

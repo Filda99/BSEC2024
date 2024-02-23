@@ -10,6 +10,7 @@ import { ExpenseTable } from '@/components/ExpenseTable';
 import { FREQUENCY_OPTIONS, ONE_TIME_OPTIONS, EXPENSE_TYPE_OPTIONS } from '@/constants';
 import { deleteExpense } from '@/api/api';
 import { Button } from '@/components/Button';
+import { CurrencyDollarIcon } from '@heroicons/react/24/outline';
 
 type ExpenseFormValues = {
   Type: number;
@@ -79,6 +80,18 @@ const Expenses = () => {
           )}
         />
 
+        {isPeriodicIncome && (
+          <Controller
+            control={control}
+            name="Frequency"
+            render={({ field: { value, onChange } }) => (
+              <InputGroup label="Frequency">
+                <Select onChange={onChange} options={FREQUENCY_OPTIONS} selected={value} />
+              </InputGroup>
+            )}
+          />
+        )}
+
         <Controller
           control={control}
           name="Start"
@@ -101,20 +114,8 @@ const Expenses = () => {
           />
         )}
 
-        {isPeriodicIncome && (
-          <Controller
-            control={control}
-            name="Frequency"
-            render={({ field: { value, onChange } }) => (
-              <InputGroup label="Frequency">
-                <Select onChange={onChange} options={FREQUENCY_OPTIONS} selected={value} />
-              </InputGroup>
-            )}
-          />
-        )}
-
         <InputGroup label="Amount">
-          <Input {...register('Value')} />
+          <Input {...register('Value')} Icon={CurrencyDollarIcon} />
         </InputGroup>
         <Button type="submit">Sumbit</Button>
       </form>
