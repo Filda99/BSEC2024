@@ -79,15 +79,14 @@ async def prediction(investmentId: str, amount: float):
             return {"message": "Investment not found.", "investmentId": investmentId}
         investment = serialize_doc(investment)
         stock = await get_BaseInfo(investment["InvestmentId"])
-        pos, neut, neg = stock[
-            "Pozitivní scénář (růstová míra %)",
-            "Neutrální scénář (růstová míra %)",
-            "Negativní scénář (růstová míra %)",
-        ]
-        return {
-            "pos": [ val / 12 * (amount * (1 + pos / 100)) for val in range(1, 13) ],
-            "neut": [ val / 12 * (amount * (1 + neut / 100)) for val in range(1, 13) ],
-            "neg": [ val / 12 * (amount * (1 + neg / 100)) for val in range(1, 13) ],
-        }
+        pos = stock["Pozitivní scénář (růstová míra %)"]
+        neut = stock["Neutrální scénář (růstová míra %)"]
+        neg = stock["Negativní scénář (růstová míra %)"]
+        pos_list, neut_list, neg_list = [], [], []
+        for m in range(1, 13):
+            pos_list.append(m / 12 * (amount * (1 + pos / 100)))
+            neut_list.append(m / 12 * (amount * (1 + neut / 100)))
+            neg_list.append(m / 12 * (amount * (1 + neg / 100)))
+        return {"pos": pos_list, "neut": neut_list, "neg": neg_list}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

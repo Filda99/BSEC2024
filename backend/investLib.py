@@ -22,7 +22,7 @@ async def get_investments():
 async def get_BaseInfo(stockId):
     collection = db.bsec
     try:
-        return await collection.find_one({"_id": stockId})
+        return await collection.find_one({"_id": ObjectId(stockId)})
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
