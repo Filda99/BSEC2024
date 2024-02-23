@@ -1,4 +1,5 @@
-from fastapi import FastAPI
+from gc import collect
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
@@ -6,8 +7,10 @@ from incomes import router as incomes_router
 from expenses import router as expenses_router
 from investments import router as investments_router
 from prof import router as profile_router
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from datetime import date as Date
+
+from common import serialize_doc, db
 
 from investLib import calculatePrediction
 
@@ -23,6 +26,11 @@ app.add_middleware(
 )
 
 
+class Stock(BaseModel):
+  id: str | None = Field(None, alias="_id")
+  name: str
+
+
 class Graph(BaseModel):
   duration: int
 
@@ -36,3 +44,15 @@ app.include_router(profile_router)
 async def root():
     values_array = await calculatePrediction("2021-01-01", "2021-12-31")
     return JSONResponse(content=values_array)
+
+@app.get("/Stocks")
+async def stocks():
+    collection = db.bsec
+    items = []
+    try:
+        async for item in collection.find():
+            items.append(serialize_doc(item))
+        items = [Stock(**item) for item in items]
+        return items
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
