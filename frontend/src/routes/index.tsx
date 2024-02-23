@@ -13,46 +13,42 @@ import { createFileRoute } from '@tanstack/react-router';
 import useSWR from 'swr';
 import PacmanLoader from 'react-spinners/PacmanLoader';
 
-// Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
+const formatChartData2 = data => {
+  const labels = data.neg.map(dp => dp[0]); // Assuming all scenarios have the same labels
+
+  const datasets = [
+    {
+      label: 'Negative scenario',
+      data: data.neg.map(dp => dp[1]),
+      borderColor: '#dc2626',
+      borderWidth: 2,
+    },
+    {
+      label: 'Neutral scenario',
+      data: data.neut.map(dp => dp[1]),
+      borderColor: '#0284c7',
+      borderWidth: 2,
+    },
+    {
+      label: 'Positive scenario',
+      data: data.pos.map(dp => dp[1]),
+      borderColor: '#65a30d',
+      borderWidth: 2,
+    },
+  ];
+
+  return {
+    labels,
+    datasets,
+  };
+};
+
 const Dashboard = () => {
-  const { data, error, isLoading, isValidating } = useSWR('/'); // Adjust your fetch URL
+  const { data: data2, isLoading: loading2, isValidating: isValidating2 } = useSWR('/Wealth');
 
-  // Assuming your API returns an array of arrays for predictions
-  // Each sub-array contains the predictions for one scenario
-
-  const formatChartData = predictions => ({
-    labels: Array.from({ length: predictions[0].length }, (_, i) => `Day ${i + 1}`),
-    datasets: [
-      {
-        label: 'Negative Scenario',
-        data: predictions[0],
-        borderColor: 'rgba(255, 99, 132, 1)',
-        borderWidth: 2,
-        tension: 0.4, // Adjust for smoothness, 0 for straight lines
-        pointRadius: 0, // Set to 0 to hide points
-      },
-      {
-        label: 'Neutral Scenario',
-        data: predictions[1],
-        borderColor: 'rgba(54, 162, 235, 1)',
-        borderWidth: 2,
-        tension: 0.4, // Adjust for smoothness
-        pointRadius: 0, // Hide points
-      },
-      {
-        label: 'Positive Scenario',
-        data: predictions[2],
-        borderColor: 'rgba(75, 192, 192, 1)',
-        borderWidth: 2,
-        tension: 0.4, // Smoothness
-        pointRadius: 0, // Hide points
-      },
-    ],
-  });
-
-  if (isLoading || isValidating) {
+  if (loading2 || isValidating2) {
     return (
       <div className="h-full flex items-center">
         <PacmanLoader className="mx-auto" color="#191817" />
@@ -60,14 +56,40 @@ const Dashboard = () => {
     );
   }
 
-  if (error) return <div>Error loading data!</div>;
-
-  // Format the fetched data for the chart
-  const chartData = formatChartData(data);
+  const chartData2 = formatChartData2(data2);
 
   return (
-    <div className="mt-4">
-      <Line data={chartData} />
+    <div className="mt-4 space-y-2">
+      <h2 className="text-2xl font-semibold">Wealth Prediction Over Time</h2>
+      <Line
+        data={chartData2}
+        options={{
+          scales: {
+            x: {
+              time: {
+                unit: 'day',
+                tooltipFormat: 'YYYY-MM-DD',
+              },
+              title: {
+                display: true,
+                text: 'Date',
+              },
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'Value',
+              },
+            },
+          },
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+          },
+        }}
+      />
     </div>
   );
 };

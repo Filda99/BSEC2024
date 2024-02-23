@@ -10,6 +10,7 @@ import { DatePicker } from '@/components/DatePicker';
 import { Button } from '@/components/Button';
 import { InvestmentsTable } from '@/components/InvestmentsTable';
 import { CurrencyDollarIcon } from '@heroicons/react/24/outline';
+import { StockGrow } from '@/components/StockGrow';
 
 export type InvestmentFormValues = {
   Type: number;
@@ -34,7 +35,7 @@ const Investments = () => {
     defaultValues: {
       Type: 0,
       OneTime: 0,
-      InvestmentId: '65d74fc56941a3ad3e242bd0',
+      InvestmentId: '65d7d71de35504b993e2dd68',
       Frequency: 0,
       Value: 100,
       Start: new Date(),
@@ -60,6 +61,8 @@ const Investments = () => {
   if (stocksLoading || investmentLoading) {
     return null;
   }
+
+  const chosenStockName = stocks.find(({ id }) => id === InvestmentId)!.name;
 
   return (
     <div className="flex space-x-5 mt-5">
@@ -136,7 +139,13 @@ const Investments = () => {
         </InputGroup>
         <Button type="submit">Sumbit</Button>
       </form>
-      <InvestmentsTable data={investments} stocks={stocks} onDelete={onDelete} />
+      <div className="flex flex-col w-full space-y-4">
+        <InvestmentsTable data={investments} stocks={stocks} onDelete={onDelete} />
+        <div className="border rounded-md p-4 space-y-2">
+          <h2 className="text-2xl text-center font-bold">{`${chosenStockName} future prediction`}</h2>
+          <StockGrow invesmentId={InvestmentId} amount={Value} />
+        </div>
+      </div>
     </div>
   );
 };
