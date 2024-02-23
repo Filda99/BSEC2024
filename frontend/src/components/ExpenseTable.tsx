@@ -1,23 +1,23 @@
-import { Income } from '@/routes/income';
 import { Column, createColumnHelper } from '@tanstack/react-table';
 import { useMemo } from 'react';
 import { Table } from './Table';
-import { FREQUENCY_OPTIONS, INCOME_TYPE_OPTIONS } from '@/constants';
+import { Expense } from '@/routes/expenses';
+import { EXPENSE_TYPE_OPTIONS, FREQUENCY_OPTIONS } from '@/constants';
 
-const columnHelper = createColumnHelper<Income>();
+const columnHelper = createColumnHelper<Expense>();
 
-type IncomeTableProps = {
-  data: Income[];
+type ExpenseTableProps = {
+  data: Expense[];
 };
 
-export const IncomeTable: React.FC<IncomeTableProps> = ({ data }) => {
+export const ExpenseTable: React.FC<ExpenseTableProps> = ({ data }) => {
   const colums = useMemo(
     () =>
       [
         columnHelper.accessor('Type', {
           id: 'type',
           header: () => 'Type',
-          cell: ({ getValue }) => INCOME_TYPE_OPTIONS.find(({ id }) => id === getValue())?.name,
+          cell: ({ getValue }) => EXPENSE_TYPE_OPTIONS.find(({ id }) => id === getValue())?.name,
         }),
         columnHelper.accessor('Frequency', {
           id: 'frequency',
@@ -46,7 +46,7 @@ export const IncomeTable: React.FC<IncomeTableProps> = ({ data }) => {
           header: () => 'To',
           cell: ({ getValue }) => getValue(),
         }),
-      ] as Column<Income>[],
+      ] as Column<Expense>[],
     [],
   );
 
