@@ -14,7 +14,7 @@ from datetime import date as Date
 
 from common import serialize_doc, db
 
-from investLib import calculatePrediction
+from investLib import calculatePrediction, aggregateWealth
 
 app = FastAPI()
 
@@ -44,8 +44,13 @@ app.include_router(profile_router)
 
 @app.get("/")
 async def root():
-    values_array = await calculatePrediction("2021-01-01", "2022-12-31")
+    values_array = await calculatePrediction("2022-01-01", "2022-12-31")
     return JSONResponse(content=values_array)
+
+@app.get("/Wealth")
+async def wealth():
+    wealth = await aggregateWealth("2022-01-01", "2022-12-31")
+    return JSONResponse(content=wealth)
 
 @app.get("/Stocks")
 async def stocks():
