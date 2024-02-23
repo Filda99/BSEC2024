@@ -73,13 +73,8 @@ async def delete_investments(investments_id: str):
 
 @router.get(base_path + "Prediction" + "/{investmentId}_{amount}")
 async def prediction(investmentId: str, amount: float):
-    collection = db.Investments
     try:
-        investment = await collection.find_one({"_id": ObjectId(investmentId)})
-        if investment is None:
-            return {"message": "Investment not found.", "investmentId": investmentId}
-        investment = serialize_doc(investment)
-        stock = await get_BaseInfo(investment["InvestmentId"])
+        stock = await get_BaseInfo(investmentId)
         pos = stock["Pozitivní scénář (růstová míra %)"]
         neut = stock["Neutrální scénář (růstová míra %)"]
         neg = stock["Negativní scénář (růstová míra %)"]
