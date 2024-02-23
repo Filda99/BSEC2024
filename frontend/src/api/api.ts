@@ -12,6 +12,9 @@ export const Fetcher = (url: string) => apiRequest.get(url).then((res) => res.da
 // Dashboard
 export const getDashboard = async () => apiRequest.get('/');
 
+// Wealth
+export const getWealth = async () => apiRequest.get('/Wealth');
+
 // Incomes
 export const getIncomes = async () => apiRequest.get('/Incomes');
 export const createIncome = async (data: unknown) => apiRequest.post('/Incomes', data);
