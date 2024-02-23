@@ -13,6 +13,9 @@ export const INVESTMENT_TYPE_OPTIONS: SelectItem[] = [
   { id: 1, name: 'Bonds' },
   { id: 2, name: 'ETFs' },
   { id: 3, name: 'Crypto' },
+  { id: 4, name: 'Real Estate' },
+  { id: 5, name: 'Cocoa Beans' },
+  { id: 6, name: 'Gold' },
 ];
 
 export const EXPENSE_TYPE_OPTIONS: SelectItem[] = [
