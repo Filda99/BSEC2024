@@ -109,7 +109,7 @@ const Investments = () => {
           control={control}
           name="Start"
           render={({ field: { value, onChange } }) => (
-            <InputGroup label={isPeriodicIncome ? 'From' : 'Date of income'}>
+            <InputGroup label={isPeriodicIncome ? 'From' : 'Date of payment'}>
               <DatePicker onChange={onChange} value={value} />
             </InputGroup>
           )}
@@ -120,14 +120,14 @@ const Investments = () => {
             control={control}
             name="End"
             render={({ field: { value, onChange } }) => (
-              <InputGroup label="To">
+              <InputGroup label="Until">
                 <DatePicker onChange={onChange} value={value} />
               </InputGroup>
             )}
           />
         )}
 
-        <InputGroup label="Amount">
+        <InputGroup label="Value">
           <Input {...register('Value')} Icon={CurrencyDollarIcon} />
         </InputGroup>
         <Button type="submit">Sumbit</Button>

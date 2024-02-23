@@ -113,7 +113,7 @@ const Income = () => {
           />
         )}
 
-        <InputGroup label="Amount">
+        <InputGroup label="Value">
           <Input {...register('Value')} Icon={CurrencyDollarIcon} />
         </InputGroup>
         <Button type="submit">Sumbit</Button>

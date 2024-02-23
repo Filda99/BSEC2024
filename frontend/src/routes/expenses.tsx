@@ -96,7 +96,7 @@ const Expenses = () => {
           control={control}
           name="Start"
           render={({ field: { value, onChange } }) => (
-            <InputGroup label={isPeriodicIncome ? 'From' : 'Date of income'}>
+            <InputGroup label={isPeriodicIncome ? 'From' : 'Date of payment'}>
               <DatePicker onChange={onChange} value={value} />
             </InputGroup>
           )}
@@ -114,7 +114,7 @@ const Expenses = () => {
           />
         )}
 
-        <InputGroup label="Amount">
+        <InputGroup label="Value">
           <Input {...register('Value')} Icon={CurrencyDollarIcon} />
         </InputGroup>
         <Button type="submit">Sumbit</Button>
