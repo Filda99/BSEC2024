@@ -11,7 +11,6 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as WealthImport } from './routes/wealth'
 import { Route as ProfileImport } from './routes/profile'
 import { Route as InvestmentsImport } from './routes/investments'
 import { Route as IncomeImport } from './routes/income'
@@ -19,11 +18,6 @@ import { Route as ExpensesImport } from './routes/expenses'
 import { Route as IndexImport } from './routes/index'
 
 // Create/Update Routes
-
-const WealthRoute = WealthImport.update({
-  path: '/wealth',
-  getParentRoute: () => rootRoute,
-} as any)
 
 const ProfileRoute = ProfileImport.update({
   path: '/profile',
@@ -74,10 +68,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileImport
       parentRoute: typeof rootRoute
     }
-    '/wealth': {
-      preLoaderRoute: typeof WealthImport
-      parentRoute: typeof rootRoute
-    }
   }
 }
 
@@ -89,7 +79,6 @@ export const routeTree = rootRoute.addChildren([
   IncomeRoute,
   InvestmentsRoute,
   ProfileRoute,
-  WealthRoute,
 ])
 
 /* prettier-ignore-end */
