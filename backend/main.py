@@ -42,7 +42,7 @@ app.include_router(profile_router)
 
 @app.get("/")
 async def root():
-    values_array = await calculatePrediction("2021-01-01", "2021-12-31")
+    values_array = await calculatePrediction(1)
     return JSONResponse(content=values_array)
 
 @app.get("/Stocks")
