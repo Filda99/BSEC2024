@@ -67,7 +67,7 @@ async def calculatePrediction(startDate, endDate):
             stockValue = 0
             for stock in stocks:
                 value = stock['value']
-                baseInfo = await get_BaseInfo(ObjectId(stock['_id']))
+                baseInfo = await get_BaseInfo(ObjectId(stock['investmentId']))
                 value += 1/365 * i * (baseInfo[scenario]) / 100 * stock['value']
                 stockValue += value
             scenarioArrays[index].append(stockValue)
