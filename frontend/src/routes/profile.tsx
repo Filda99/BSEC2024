@@ -15,14 +15,16 @@ const Profile = () => {
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading data!</div>;
-  
-  return <div>
-    <h1>Profile</h1>
-    <p>Name: {data?.Name}</p>
-    <p>Surname: {data?.Surname}</p>
-    <p>Date of birth: {format(data?.DateOfBirth, 'd. M. yyyy')}</p>
-    <p>Retirement date: {format(data?.RetirementDate, 'd. M. yyyy')}</p>
-  </div>
+
+  return (
+    <div>
+      <h1>Profile</h1>
+      <p>Name: {data?.Name}</p>
+      <p>Surname: {data?.Surname}</p>
+      <p>Date of birth: {format(data?.DateOfBirth, 'd. M. yyyy')}</p>
+      <p>Retirement date: {format(data?.RetirementDate, 'd. M. yyyy')}</p>
+    </div>
+  );
 };
 
 export const Route = createFileRoute('/profile')({

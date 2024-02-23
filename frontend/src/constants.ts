@@ -6,6 +6,13 @@ export const INCOME_TYPE_OPTIONS: SelectItem[] = [
   { id: 2, name: 'Other' },
 ];
 
+export const INVESTMENT_TYPE_OPTIONS: SelectItem[] = [
+  { id: 0, name: 'Stocks' },
+  { id: 1, name: 'Bonds' },
+  { id: 2, name: 'ETFS' },
+  { id: 3, name: 'Crypto' },
+];
+
 export const EXPENSE_TYPE_OPTIONS: SelectItem[] = [
   { id: 0, name: 'Food' },
   { id: 1, name: 'Hobbies' },
@@ -22,6 +29,6 @@ export const FREQUENCY_OPTIONS: SelectItem[] = [
 ];
 
 export const ONE_TIME_OPTIONS: SelectItem[] = [
-  { id: 0, name: 'Periodicaly' },
+  { id: 0, name: 'Periodically' },
   { id: 1, name: 'One time' },
 ];
