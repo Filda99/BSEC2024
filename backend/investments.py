@@ -58,7 +58,7 @@ async def update_investments(investments: Investments):
 # Delete investment
 @router.delete(base_path + "{investments_id}")
 async def delete_investments(investments_id: str):
-    collection = db.Expenses
+    collection = db.Investments
     try:
         # Convert the string ID to ObjectId and attempt to delete the corresponding document
         result = await collection.delete_one({"_id": ObjectId(investments_id)})
