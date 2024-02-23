@@ -23,3 +23,4 @@ Install node.js
 cd frontend
 npm install
 npm run dev
+npm install --save react-chartjs-2 chart.js
