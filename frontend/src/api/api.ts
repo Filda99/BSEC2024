@@ -9,6 +9,9 @@ export const apiRequest = axios.create({
 
 export const Fetcher = (url: string) => apiRequest.get(url).then((res) => res.data);
 
+// Dashboard
+export const getDashboard = async () => apiRequest.get('/');
+
 // Incomes
 export const getIncomes = async () => apiRequest.get('/Incomes');
 export const createIncome = async (data: unknown) => apiRequest.post('/Incomes', data);

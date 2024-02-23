@@ -62,25 +62,17 @@ async def calculatePrediction(startDate, endDate):
     scenarios = ['Negativní scénář (růstová míra %)', 'Neutrální scénář (růstová míra %)', 'Pozitivní scénář (růstová míra %)']
     scenarioArrays = [[], [], []]
     for index, scenario in enumerate(scenarios):
-        for stock in stocks:
+        for i in range(duration):
             # Get base info from bsec database
-            baseInfo = await get_BaseInfo(ObjectId(stock['_id']))
-            for i in range(duration):
-                value = baseInfo['Value'] * 1/365 * i * (baseInfo[scenario]) / 100
-                scenarioArrays[index].append(value)
+            stockValue = 0
+            for stock in stocks:
+                value = stock['value']
+                baseInfo = await get_BaseInfo(ObjectId(stock['_id']))
+                value += 1/365 * i * (baseInfo[scenario]) / 100 * stock['value']
+                stockValue += value
+            scenarioArrays[index].append(stockValue)
     
     # Sum the scenarioArrays and return the result
-    summed_array = [sum(elements) for elements in zip(*scenarioArrays)]
+    # summed_array = [sum(elements) for elements in zip(*scenarioArrays)]
     
-    # Calculate the free cash flow based on expenses and incomes
-    expenses = await get_expenses()
-    incomes = await get_incomes()
-    freeCashFlow = 0
-    for expense in expenses:
-        freeCashFlow -= expense['Value']
-    for income in incomes:
-        freeCashFlow += income['Value']
-    
-    # Iterate through the summed_array and add the free cash flow
-    for index, value in enumerate(summed_array):
-        summed_array[index] += freeCashFlow
+    return scenarioArrays
