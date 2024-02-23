@@ -84,34 +84,43 @@ async def calculatePrediction(startDate, endDate):
 
     return scenarioArrays
 
+def makedate(date):
+    try:
+        return datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.%fZ")
+    except:
+        return datetime.fromisoformat(str(date))
+
 
 # Get incomes, mark the dates when something changes and return the array of (dates, sum of incomes)
 async def getEventDatesValues(startDate, endDate, collection):
     # Calculate days between the start and end date from string to datetime
-    start_date = datetime.fromisoformat(startDate)
-    end_date = datetime.fromisoformat(endDate)
+    start_date = makedate(startDate)
+    end_date = makedate(endDate)
 
     total_event_dates = []
     for event in collection:
-        event_start = datetime.fromisoformat(str(event["Start"]))
-        event_end = datetime.fromisoformat(str(event["End"])) if event["End"] else end_date
+        event_start = makedate(event["Start"])
+        event_end = makedate(event["End"]) if event["End"] else end_date
         frequency = event["Frequency"]
         value = event["Value"]
 
         # Check for one-time event
         if event["OneTime"] and start_date <= event_start <= end_date:
-            total_event_dates.append((event_start, value))
+            total_event_dates.append([event_start, value])
         # Handle recurring collection
         elif not event["OneTime"] and start_date <= event_start <= end_date:
             current_date = event_start
             while current_date <= event_end and current_date <= end_date:
                 if current_date >= start_date:
-                    total_event_dates.append((current_date, value))
+                    total_event_dates.append([current_date, value])
                 # Advance to the next event date based on the frequency
                 if frequency == "Yearly":
-                    current_date += timedelta(days=365)
+                    current_date = current_date.replace(year=current_date.year + 1)
                 elif frequency == "Monthly":
-                    current_date += timedelta(days=30)
+                    if current_date.month == 12:
+                        current_date = current_date.replace(year=current_date.year + 1, month=1)
+                    else:
+                        current_date = current_date.replace(month=current_date.month + 1)
                 elif frequency == "Weekly":
                     current_date += timedelta(days=7)
                 elif frequency == "Daily":
@@ -123,7 +132,7 @@ async def getEventDatesValues(startDate, endDate, collection):
     total_event_dates.sort(key=lambda x: x[0])
     for i, (date, value) in enumerate(total_event_dates):
         if i > 0 and date == total_event_dates[i - 1][0]:
-            total_event_dates[i] = (date, value + total_event_dates[i - 1][1])
+            total_event_dates[i] = [date, value + total_event_dates[i - 1][1]]
             total_event_dates[i - 1] = None
     total_event_dates = [x for x in total_event_dates if x is not None]
     return total_event_dates
@@ -138,7 +147,7 @@ async def getExpenseDates(startDate, endDate):
     expenses = await get_expenses()
     expenses = await getEventDatesValues(startDate, endDate, expenses)
     # Negate the values of expenses
-    expenses = map(lambda x: (x[0], -x[1]), expenses)
+    expenses = map(lambda x: [x[0], -x[1]], expenses)
     return list(expenses)
 
 
@@ -147,7 +156,7 @@ async def getInvestmentDates(startDate, endDate):
     return await getEventDatesValues(startDate, endDate, investments)
 
 
-async def aggregateWealth(startDate, endDate):
+async def datelyChanges(startDate, endDate):
     incomes = await getIncomeDates(startDate, endDate)
     expenses = await getExpenseDates(startDate, endDate)
     investments = await getInvestmentDates(startDate, endDate)
@@ -156,7 +165,18 @@ async def aggregateWealth(startDate, endDate):
     total_event_dates.sort(key=lambda x: x[0])
     for i, (date, value) in enumerate(total_event_dates):
         if i > 0 and date == total_event_dates[i - 1][0]:
-            total_event_dates[i] = (date, value + total_event_dates[i - 1][1])
+            total_event_dates[i] = [date, value + total_event_dates[i - 1][1]]
             total_event_dates[i - 1] = None
     total_event_dates = [x for x in total_event_dates if x is not None]
     return total_event_dates
+
+
+async def aggregateWealth(startDate, endDate):
+    event_dates = await datelyChanges(startDate, endDate)
+    # Calculate the wealth based on the event dates
+    wealth = []
+    current_wealth = 0
+    for date, value in event_dates:
+        current_wealth += value
+        wealth.append([date, current_wealth])
+    return wealth
