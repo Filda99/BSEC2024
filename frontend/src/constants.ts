@@ -3,7 +3,9 @@ import { SelectItem } from './components/Select';
 export const INCOME_TYPE_OPTIONS: SelectItem[] = [
   { id: 0, name: 'Salary' },
   { id: 1, name: 'Gift' },
-  { id: 2, name: 'Other' },
+  { id: 2, name: 'Dividends' },
+  { id: 3, name: 'Lease' },
+  { id: 4, name: 'Other' },
 ];
 
 export const INVESTMENT_TYPE_OPTIONS: SelectItem[] = [
