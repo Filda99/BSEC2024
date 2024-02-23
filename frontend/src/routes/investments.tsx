@@ -48,6 +48,7 @@ const Investments = () => {
   };
 
   const isPeriodicIncome = watch('OneTime') === 0;
+  const isStockSelected = watch('Type') === 0;
 
   const onSubmit = async (data: InvestmentFormValues) => {
     const response = await createInvestments(data);
@@ -63,6 +64,7 @@ const Investments = () => {
   return (
     <div className="flex space-x-5 mt-5">
       <form className="space-y-4 min-w-[256px]" onSubmit={handleSubmit(onSubmit)}>
+        
         <Controller
           control={control}
           name="Type"
@@ -73,15 +75,17 @@ const Investments = () => {
           )}
         />
 
-        <Controller
-          control={control}
-          name="InvestmentId"
-          render={({ field: { value, onChange } }) => (
-            <InputGroup label="Stock">
-              <Select onChange={onChange} options={stocks as SelectItem[]} selected={value} />
-            </InputGroup>
-          )}
-        />
+        {isStockSelected && (
+          <Controller
+            control={control}
+            name="InvestmentId"
+            render={({ field: { value, onChange } }) => (
+              <InputGroup label="Stock">
+                <Select onChange={onChange} options={stocks as SelectItem[]} selected={value} />
+              </InputGroup>
+            )}
+          />
+        )}
 
         <Controller
           control={control}
