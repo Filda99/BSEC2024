@@ -50,10 +50,13 @@ async def get_incomes():
 
 
 # Function will calculate the prediction of the stock for the possible scenarios
-async def calculatePrediction(durationInYears):
+async def calculatePrediction(startDate, endDate):
     # Calculate days between the start and end date from string to datetime
     
-    duration = durationInYears * 365
+    start_date_obj = datetime.fromisoformat(startDate)
+    end_date_obj = datetime.fromisoformat(endDate)
+
+    duration = (end_date_obj - start_date_obj).days
     
     stocks = await get_investments()
     scenarios = ['Negativní scénář (růstová míra %)', 'Neutrální scénář (růstová míra %)', 'Pozitivní scénář (růstová míra %)']
