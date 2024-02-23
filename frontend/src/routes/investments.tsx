@@ -34,7 +34,7 @@ const Investments = () => {
     defaultValues: {
       Type: 0,
       OneTime: 0,
-      InvestmentId: '65d7d71de35504b993e2dd68',
+      InvestmentId: '65d74fc56941a3ad3e242bd0',
       Frequency: 0,
       Value: 100,
       Start: new Date(),
