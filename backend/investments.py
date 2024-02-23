@@ -78,7 +78,7 @@ async def prediction(investmentId: str, amount: float):
         pos = stock["Pozitivní scénář (růstová míra %)"]
         neut = stock["Neutrální scénář (růstová míra %)"]
         neg = stock["Negativní scénář (růstová míra %)"]
-        init_value = stock["kurz"]*amount
+        init_value = amount
         pos_list, neut_list, neg_list = [init_value], [init_value], [init_value]
         for m in range(1, 13):
             pos_list.append((m / 12 * pos / 100 * init_value) + init_value)
