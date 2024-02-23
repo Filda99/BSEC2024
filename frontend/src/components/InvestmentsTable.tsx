@@ -1,26 +1,35 @@
-import { Income } from '@/routes/income';
-import { Column, createColumnHelper } from '@tanstack/react-table';
-import { useMemo } from 'react';
+import { FREQUENCY_OPTIONS, INVESTMENT_TYPE_OPTIONS } from '@/constants';
+import { Column, createColumnHelper } from '@tanstack/table-core';
+import React, { useMemo } from 'react';
 import { Table } from './Table';
-import { FREQUENCY_OPTIONS, INCOME_TYPE_OPTIONS } from '@/constants';
+import { Investment } from '@/routes/investments';
 import { format } from 'date-fns';
 import { TrashIcon } from '@heroicons/react/24/outline';
 
-const columnHelper = createColumnHelper<Income>();
+const columnHelper = createColumnHelper<Investment>();
 
-type IncomeTableProps = {
-  data: Income[];
+type InvestmentTableProps = {
+  data: Investment[];
   onDelete: (id: string) => void;
+  stocks: {
+    id: string;
+    name: string;
+  }[];
 };
 
-export const IncomeTable: React.FC<IncomeTableProps> = ({ data, onDelete }) => {
+export const InvestmentsTable: React.FC<InvestmentTableProps> = ({ data, stocks, onDelete }) => {
   const colums = useMemo(
     () =>
       [
         columnHelper.accessor('Type', {
           id: 'type',
           header: () => 'Type',
-          cell: ({ getValue }) => INCOME_TYPE_OPTIONS.find(({ id }) => id === getValue())?.name,
+          cell: ({ getValue }) => INVESTMENT_TYPE_OPTIONS.find(({ id }) => id === getValue())?.name,
+        }),
+        columnHelper.accessor('InvestmentId', {
+          id: 'stock-name',
+          header: () => 'Stock name',
+          cell: ({ getValue }) => stocks.find(({ id }) => id === getValue())?.name,
         }),
         columnHelper.accessor('Frequency', {
           id: 'frequency',
@@ -61,8 +70,8 @@ export const IncomeTable: React.FC<IncomeTableProps> = ({ data, onDelete }) => {
             );
           },
         }),
-      ] as Column<Income>[],
-    [onDelete],
+      ] as Column<Investment>[],
+    [stocks, onDelete],
   );
 
   return <Table data={data} columns={colums} />;

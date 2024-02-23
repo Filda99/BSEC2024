@@ -6,7 +6,7 @@ import { InputGroup } from '@/components/InputGroup';
 import { Select } from '@/components/Select';
 import { createFileRoute } from '@tanstack/react-router';
 import { Controller, useForm } from 'react-hook-form';
-import { createIncome } from '@/api/api';
+import { createIncome, deleteIncome } from '@/api/api';
 import useSWR from 'swr';
 import { FREQUENCY_OPTIONS, ONE_TIME_OPTIONS, INCOME_TYPE_OPTIONS } from '@/constants';
 
@@ -20,7 +20,7 @@ export type IncomeFormValues = {
 };
 
 export type Income = {
-  id: string;
+  _id: string;
 } & IncomeFormValues;
 
 const Income = () => {
@@ -28,14 +28,19 @@ const Income = () => {
 
   const { register, control, watch, handleSubmit } = useForm<IncomeFormValues>({
     defaultValues: {
-      Value: 0,
-      Type: 1,
+      Value: 100,
+      Type: 0,
       OneTime: 0,
-      Frequency: 1,
+      Frequency: 0,
       Start: new Date(),
       End: new Date(),
     },
   });
+
+  const onDelete = async (id: string) => {
+    await deleteIncome(id);
+    mutate();
+  };
 
   const isPeriodicIncome = watch('OneTime') === 0;
 
@@ -51,13 +56,13 @@ const Income = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <form className="space-y-4 mt-5 max-w-72" onSubmit={handleSubmit(onSubmit)}>
+    <div className="flex space-x-5 mt-5">
+      <form className="space-y-4 max-w-64 min-w-[256px]" onSubmit={handleSubmit(onSubmit)}>
         <Controller
           control={control}
           name="Type"
           render={({ field: { value, onChange } }) => (
-            <InputGroup label="Type">
+            <InputGroup label="Income type">
               <Select onChange={onChange} options={INCOME_TYPE_OPTIONS} selected={value} />
             </InputGroup>
           )}
@@ -67,7 +72,7 @@ const Income = () => {
           control={control}
           name="OneTime"
           render={({ field: { value, onChange } }) => (
-            <InputGroup label="One time">
+            <InputGroup label="Payment schedule">
               <Select onChange={onChange} options={ONE_TIME_OPTIONS} selected={value} />
             </InputGroup>
           )}
@@ -112,7 +117,7 @@ const Income = () => {
         </InputGroup>
         <Button type="submit">Sumbit</Button>
       </form>
-      <IncomeTable data={data} />
+      <IncomeTable data={data} onDelete={onDelete} />
     </div>
   );
 };

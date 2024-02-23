@@ -1,9 +1,10 @@
 from fastapi import HTTPException
 from common import serialize_doc, db
 from bson import ObjectId
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Assuming you have a 'db' instance of MongoClient already defined
+
 
 # Function will get all stocks from the database Invesments collection
 async def get_investments():
@@ -15,7 +16,7 @@ async def get_investments():
         return items
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
+
 
 async def get_BaseInfo(stockId):
     collection = db.bsec
@@ -35,7 +36,7 @@ async def get_expenses():
         return items
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
+
 
 # Function will get all incomes from the database Incomes collection
 async def get_incomes():
@@ -52,27 +53,110 @@ async def get_incomes():
 # Function will calculate the prediction of the stock for the possible scenarios
 async def calculatePrediction(startDate, endDate):
     # Calculate days between the start and end date from string to datetime
-    
+
     start_date_obj = datetime.fromisoformat(startDate)
     end_date_obj = datetime.fromisoformat(endDate)
 
     duration = (end_date_obj - start_date_obj).days
-    
+
     stocks = await get_investments()
-    scenarios = ['Negativní scénář (růstová míra %)', 'Neutrální scénář (růstová míra %)', 'Pozitivní scénář (růstová míra %)']
+    scenarios = [
+        "Negativní scénář (růstová míra %)",
+        "Neutrální scénář (růstová míra %)",
+        "Pozitivní scénář (růstová míra %)",
+    ]
     scenarioArrays = [[], [], []]
     for index, scenario in enumerate(scenarios):
         for i in range(duration):
             # Get base info from bsec database
             stockValue = 0
             for stock in stocks:
-                value = stock['Value']
-                baseInfo = await get_BaseInfo(ObjectId(stock['InvestmentId']))
-                value += 1/365 * i * (baseInfo[scenario]) / 100 * stock['Value']
+                value = stock["Value"]
+                baseInfo = await get_BaseInfo(ObjectId(stock["InvestmentId"]))
+                if baseInfo is None:
+                    raise HTTPException(status_code=404, detail="Base info not found")
+                value += 1 / 365 * i * (baseInfo[scenario]) / 100 * stock["Value"]
                 stockValue += value
             scenarioArrays[index].append(stockValue)
-    
+
     # Sum the scenarioArrays and return the result
     # summed_array = [sum(elements) for elements in zip(*scenarioArrays)]
-    
+
     return scenarioArrays
+
+
+# Get incomes, mark the dates when something changes and return the array of (dates, sum of incomes)
+async def getEventDatesValues(startDate, endDate, collection):
+    # Calculate days between the start and end date from string to datetime
+    start_date = datetime.fromisoformat(startDate)
+    end_date = datetime.fromisoformat(endDate)
+
+    total_event_dates = []
+    for event in collection:
+        event_start = datetime.fromisoformat(str(event["Start"]))
+        event_end = datetime.fromisoformat(str(event["End"])) if event["End"] else end_date
+        frequency = event["Frequency"]
+        value = event["Value"]
+
+        # Check for one-time event
+        if event["OneTime"] and start_date <= event_start <= end_date:
+            total_event_dates.append((event_start, value))
+        # Handle recurring collection
+        elif not event["OneTime"] and start_date <= event_start <= end_date:
+            current_date = event_start
+            while current_date <= event_end and current_date <= end_date:
+                if current_date >= start_date:
+                    total_event_dates.append((current_date, value))
+                # Advance to the next event date based on the frequency
+                if frequency == "Yearly":
+                    current_date += timedelta(days=365)
+                elif frequency == "Monthly":
+                    current_date += timedelta(days=30)
+                elif frequency == "Weekly":
+                    current_date += timedelta(days=7)
+                elif frequency == "Daily":
+                    current_date += timedelta(days=1)
+                # Add other frequency types as needed
+                else:
+                    break  # Unsupported frequency type, exit the loop
+    # Sort the total_event_dates array by date and merge the same dates
+    total_event_dates.sort(key=lambda x: x[0])
+    for i, (date, value) in enumerate(total_event_dates):
+        if i > 0 and date == total_event_dates[i - 1][0]:
+            total_event_dates[i] = (date, value + total_event_dates[i - 1][1])
+            total_event_dates[i - 1] = None
+    total_event_dates = [x for x in total_event_dates if x is not None]
+    return total_event_dates
+
+
+async def getIncomeDates(startDate, endDate):
+    incomes = await get_incomes()
+    return await getEventDatesValues(startDate, endDate, incomes)
+
+
+async def getExpenseDates(startDate, endDate):
+    expenses = await get_expenses()
+    expenses = await getEventDatesValues(startDate, endDate, expenses)
+    # Negate the values of expenses
+    expenses = map(lambda x: (x[0], -x[1]), expenses)
+    return list(expenses)
+
+
+async def getInvestmentDates(startDate, endDate):
+    investments = await get_investments()
+    return await getEventDatesValues(startDate, endDate, investments)
+
+
+async def aggregateWealth(startDate, endDate):
+    incomes = await getIncomeDates(startDate, endDate)
+    expenses = await getExpenseDates(startDate, endDate)
+    investments = await getInvestmentDates(startDate, endDate)
+    # Merge the arrays and sort them by date
+    total_event_dates = incomes + expenses + investments
+    total_event_dates.sort(key=lambda x: x[0])
+    for i, (date, value) in enumerate(total_event_dates):
+        if i > 0 and date == total_event_dates[i - 1][0]:
+            total_event_dates[i] = (date, value + total_event_dates[i - 1][1])
+            total_event_dates[i - 1] = None
+    total_event_dates = [x for x in total_event_dates if x is not None]
+    return total_event_dates

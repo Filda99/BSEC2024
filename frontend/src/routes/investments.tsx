@@ -1,52 +1,85 @@
-import { createIncome } from '@/api/api';
-import { IncomeTable } from '@/components/IncomeTable';
+import { createInvestments, deleteInvestment } from '@/api/api';
 import { Input } from '@/components/Input';
 import { InputGroup } from '@/components/InputGroup';
-import { Select } from '@/components/Select';
-import { INCOME_TYPE_OPTIONS, ONE_TIME_OPTIONS, FREQUENCY_OPTIONS } from '@/constants';
+import { Select, SelectItem } from '@/components/Select';
+import { ONE_TIME_OPTIONS, FREQUENCY_OPTIONS, INVESTMENT_TYPE_OPTIONS } from '@/constants';
 import { createFileRoute } from '@tanstack/react-router';
 import { useForm, Controller } from 'react-hook-form';
 import useSWR from 'swr';
-import { IncomeFormValues } from './income';
 import { DatePicker } from '@/components/DatePicker';
 import { Button } from '@/components/Button';
+import { InvestmentsTable } from '@/components/InvestmentsTable';
+import { useEffect } from 'react';
+import { set } from 'date-fns';
+
+export type InvestmentFormValues = {
+  Type: number;
+  OneTime: number;
+  InvestmentId: string;
+  Frequency: number;
+  Value: number;
+  Start: Date;
+  End: Date;
+};
+
+export type Investment = {
+  _id: string;
+  InvestmentId: string;
+} & InvestmentFormValues;
 
 const Investments = () => {
-  const { data, isLoading, mutate } = useSWR('/Incomes');
+  const { data: stocks, isLoading: stocksLoading } = useSWR('/Stocks');
+  const { data: investments, isLoading: investmentLoading, mutate } = useSWR('/Investments');
 
-  const { register, control, watch, handleSubmit } = useForm<IncomeFormValues>({
+  const { register, control, watch, handleSubmit } = useForm<InvestmentFormValues>({
     defaultValues: {
-      Value: 0,
-      Type: 1,
+      Type: 0,
       OneTime: 0,
-      Frequency: 1,
+      InvestmentId: '65d7d71de35504b993e2dd68',
+      Frequency: 0,
+      Value: 100,
       Start: new Date(),
       End: new Date(),
     },
   });
 
+  const onDelete = async (id: string) => {
+    await deleteInvestment(id);
+    mutate();
+  };
+
   const isPeriodicIncome = watch('OneTime') === 0;
 
-  const onSubmit = async (data: IncomeFormValues) => {
-    const response = await createIncome(data);
+  const onSubmit = async (data: InvestmentFormValues) => {
+    const response = await createInvestments(data);
     if (response.status === 200) {
       mutate();
     }
   };
 
-  if (isLoading) {
+  if (stocksLoading || investmentLoading) {
     return null;
   }
 
   return (
-    <div className="space-y-6">
-      <form className="space-y-4 mt-5 max-w-72" onSubmit={handleSubmit(onSubmit)}>
+    <div className="flex space-x-5 mt-5">
+      <form className="space-y-4 min-w-[256px]" onSubmit={handleSubmit(onSubmit)}>
         <Controller
           control={control}
           name="Type"
           render={({ field: { value, onChange } }) => (
-            <InputGroup label="Type">
-              <Select onChange={onChange} options={INCOME_TYPE_OPTIONS} selected={value} />
+            <InputGroup label="Investment type">
+              <Select onChange={onChange} options={INVESTMENT_TYPE_OPTIONS} selected={value} />
+            </InputGroup>
+          )}
+        />
+
+        <Controller
+          control={control}
+          name="InvestmentId"
+          render={({ field: { value, onChange } }) => (
+            <InputGroup label="Stock">
+              <Select onChange={onChange} options={stocks as SelectItem[]} selected={value} />
             </InputGroup>
           )}
         />
@@ -55,7 +88,7 @@ const Investments = () => {
           control={control}
           name="OneTime"
           render={({ field: { value, onChange } }) => (
-            <InputGroup label="One time">
+            <InputGroup label="Payment schedule">
               <Select onChange={onChange} options={ONE_TIME_OPTIONS} selected={value} />
             </InputGroup>
           )}
@@ -100,7 +133,7 @@ const Investments = () => {
         </InputGroup>
         <Button type="submit">Sumbit</Button>
       </form>
-      <IncomeTable data={data} />
+      <InvestmentsTable data={investments} stocks={stocks} onDelete={onDelete} />
     </div>
   );
 };

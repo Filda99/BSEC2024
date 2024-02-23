@@ -8,6 +8,7 @@ import useSWR from 'swr';
 import { createExpenses } from '@/api/api';
 import { ExpenseTable } from '@/components/ExpenseTable';
 import { FREQUENCY_OPTIONS, ONE_TIME_OPTIONS, EXPENSE_TYPE_OPTIONS } from '@/constants';
+import { deleteExpense } from '@/api/api';
 import { Button } from '@/components/Button';
 
 type ExpenseFormValues = {
@@ -20,7 +21,7 @@ type ExpenseFormValues = {
 };
 
 export type Expense = {
-  id: string;
+  _id: string;
 } & ExpenseFormValues;
 
 const Expenses = () => {
@@ -28,14 +29,19 @@ const Expenses = () => {
 
   const { register, control, watch, handleSubmit } = useForm<ExpenseFormValues>({
     defaultValues: {
-      Value: 0,
-      Type: 1,
+      Value: 100,
+      Type: 0,
       OneTime: 0,
-      Frequency: 1,
+      Frequency: 0,
       Start: new Date(),
       End: new Date(),
     },
   });
+
+  const onDelete = async (id: string) => {
+    await deleteExpense(id);
+    mutate();
+  };
 
   const isPeriodicIncome = watch('OneTime') === 0;
 
@@ -51,13 +57,13 @@ const Expenses = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <form className="space-y-4 mt-5 max-w-72" onSubmit={handleSubmit(onSubmit)}>
+    <div className="flex space-x-5 mt-5 ">
+      <form className="space-y-4 w-64 min-w-[256px]" onSubmit={handleSubmit(onSubmit)}>
         <Controller
           control={control}
           name="Type"
           render={({ field: { value, onChange } }) => (
-            <InputGroup label="Type">
+            <InputGroup label="Expense type">
               <Select onChange={onChange} options={EXPENSE_TYPE_OPTIONS} selected={value} />
             </InputGroup>
           )}
@@ -67,7 +73,7 @@ const Expenses = () => {
           control={control}
           name="OneTime"
           render={({ field: { value, onChange } }) => (
-            <InputGroup label="One time">
+            <InputGroup label="Payment schedule">
               <Select onChange={onChange} options={ONE_TIME_OPTIONS} selected={value} />
             </InputGroup>
           )}
@@ -112,7 +118,7 @@ const Expenses = () => {
         </InputGroup>
         <Button type="submit">Sumbit</Button>
       </form>
-      <ExpenseTable data={data} />
+      <ExpenseTable data={data} onDelete={onDelete} />
     </div>
   );
 };
