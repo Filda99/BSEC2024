@@ -17,6 +17,7 @@ class Investments(BaseModel):
     End: str | None
     Frequency: int
     Value: float
+    InvestmentId: str
 
 
 # Get all investments
@@ -53,19 +54,8 @@ async def update_investments(investments: Investments):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
-# Delete investments
-@router.delete(base_path)
-async def delete_investments(investments: Investments):
-    collection = db.Investments
-    try:
-        await collection.delete_one({"_id": ObjectId(investments.id)})
-        return {"_id": str(investments.id)}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    
-
-@router.delete(base_path+"{investments_id}")
+# Delete investment
+@router.delete(base_path + "{investments_id}")
 async def delete_investments(investments_id: str):
     collection = db.Expenses
     try:
