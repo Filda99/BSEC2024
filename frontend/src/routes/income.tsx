@@ -3,29 +3,12 @@ import { DatePicker } from '@/components/DatePicker';
 import { IncomeTable } from '@/components/IncomeTable';
 import { Input } from '@/components/Input';
 import { InputGroup } from '@/components/InputGroup';
-import { Select, SelectItem } from '@/components/Select';
+import { Select } from '@/components/Select';
 import { createFileRoute } from '@tanstack/react-router';
 import { Controller, useForm } from 'react-hook-form';
 import { createIncome } from '@/api/api';
 import useSWR from 'swr';
-
-export const TYPE_OPTIONS: SelectItem[] = [
-  { id: 0, name: 'Salary' },
-  { id: 1, name: 'Gift' },
-  { id: 2, name: 'Ohter' },
-];
-
-export const FREQUENCY_OPTIONS: SelectItem[] = [
-  { id: 0, name: 'Daily' },
-  { id: 1, name: 'Weekly' },
-  { id: 2, name: 'Monthly' },
-  { id: 3, name: 'Yearly' },
-];
-
-export const ONE_TIME_OPTIONS: SelectItem[] = [
-  { id: 0, name: 'Periodicaly' },
-  { id: 1, name: 'One time' },
-];
+import { FREQUENCY_OPTIONS, ONE_TIME_OPTIONS, INCOME_TYPE_OPTIONS } from '@/constants';
 
 export type IncomeFormValues = {
   Type: number;
@@ -37,12 +20,11 @@ export type IncomeFormValues = {
 };
 
 export type Income = {
-  id: number;
+  id: string;
 } & IncomeFormValues;
 
 const Income = () => {
   const { data, isLoading, mutate } = useSWR('/Incomes');
-  console.log(data);
 
   const { register, control, watch, handleSubmit } = useForm<IncomeFormValues>({
     defaultValues: {
@@ -76,7 +58,7 @@ const Income = () => {
           name="Type"
           render={({ field: { value, onChange } }) => (
             <InputGroup label="Type">
-              <Select onChange={onChange} options={TYPE_OPTIONS} selected={value} />
+              <Select onChange={onChange} options={INCOME_TYPE_OPTIONS} selected={value} />
             </InputGroup>
           )}
         />
