@@ -7,6 +7,7 @@ import { Select, SelectItem } from '@/components/Select';
 import { createFileRoute } from '@tanstack/react-router';
 import { Controller, useForm } from 'react-hook-form';
 import { createIncome } from '@/api/api';
+import useSWR from 'swr';
 
 export const TYPE_OPTIONS: SelectItem[] = [
   { id: 0, name: 'Salary' },
@@ -15,15 +16,15 @@ export const TYPE_OPTIONS: SelectItem[] = [
 ];
 
 export const FREQUENCY_OPTIONS: SelectItem[] = [
-  { id: 1, name: 'Daily' },
-  { id: 2, name: 'Weekly' },
-  { id: 3, name: 'Monthly' },
-  { id: 4, name: 'Yearly' },
+  { id: 0, name: 'Daily' },
+  { id: 1, name: 'Weekly' },
+  { id: 2, name: 'Monthly' },
+  { id: 3, name: 'Yearly' },
 ];
 
 export const ONE_TIME_OPTIONS: SelectItem[] = [
-  { id: 1, name: 'Periodicaly' },
-  { id: 0, name: 'One time' },
+  { id: 0, name: 'Periodicaly' },
+  { id: 1, name: 'One time' },
 ];
 
 export type IncomeFormValues = {
@@ -35,7 +36,14 @@ export type IncomeFormValues = {
   End: Date;
 };
 
+export type Income = {
+  id: number;
+} & IncomeFormValues;
+
 const Income = () => {
+  const { data, isLoading, mutate } = useSWR('/Incomes');
+  console.log(data);
+
   const { register, control, watch, handleSubmit } = useForm<IncomeFormValues>({
     defaultValues: {
       Value: 0,
@@ -47,11 +55,18 @@ const Income = () => {
     },
   });
 
-  const isOneTimeIncome = watch('OneTime');
+  const isPeriodicIncome = watch('OneTime') === 0;
 
-  const onSubmit = (data: IncomeFormValues) => {
-    createIncome(data);
+  const onSubmit = async (data: IncomeFormValues) => {
+    const response = await createIncome(data);
+    if (response.status === 200) {
+      mutate();
+    }
   };
+
+  if (isLoading) {
+    return null;
+  }
 
   return (
     <div className="space-y-6">
@@ -68,25 +83,6 @@ const Income = () => {
 
         <Controller
           control={control}
-          name="Start"
-          render={({ field: { value, onChange } }) => (
-            <InputGroup label="From">
-              <DatePicker onChange={onChange} value={value} />
-            </InputGroup>
-          )}
-        />
-        <Controller
-          control={control}
-          name="End"
-          render={({ field: { value, onChange } }) => (
-            <InputGroup label="To">
-              <DatePicker onChange={onChange} value={value} />
-            </InputGroup>
-          )}
-        />
-
-        <Controller
-          control={control}
           name="OneTime"
           render={({ field: { value, onChange } }) => (
             <InputGroup label="One time">
@@ -95,7 +91,29 @@ const Income = () => {
           )}
         />
 
-        {isOneTimeIncome === 1 && (
+        <Controller
+          control={control}
+          name="Start"
+          render={({ field: { value, onChange } }) => (
+            <InputGroup label={isPeriodicIncome ? 'From' : 'Date of income'}>
+              <DatePicker onChange={onChange} value={value} />
+            </InputGroup>
+          )}
+        />
+
+        {isPeriodicIncome && (
+          <Controller
+            control={control}
+            name="End"
+            render={({ field: { value, onChange } }) => (
+              <InputGroup label="To">
+                <DatePicker onChange={onChange} value={value} />
+              </InputGroup>
+            )}
+          />
+        )}
+
+        {isPeriodicIncome && (
           <Controller
             control={control}
             name="Frequency"
@@ -107,33 +125,12 @@ const Income = () => {
           />
         )}
 
-        <Controller
-          control={control}
-          name="Start"
-          render={({ field: { value, onChange } }) => (
-            <InputGroup label="From">
-              <DatePicker onChange={onChange} value={value} />
-            </InputGroup>
-          )}
-        />
-
-        {isOneTimeIncome === 1 && (
-          <Controller
-            control={control}
-            name="End"
-            render={({ field: { value, onChange } }) => (
-              <InputGroup label="To">
-                <DatePicker onChange={onChange} value={value} />
-              </InputGroup>
-            )}
-          />
-        )}
         <InputGroup label="Amount">
           <Input {...register('Value')} />
         </InputGroup>
         <Button type="submit">Sumbit</Button>
       </form>
-      <IncomeTable />
+      <IncomeTable data={data} />
     </div>
   );
 };
